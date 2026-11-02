@@ -1,5 +1,6 @@
 #include "Board.h"
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -43,22 +44,62 @@ bool Board::canPlace(int row, int col, int length, Orientation dir) const {
     return true;
 }
 
-bool Board::placeShip(int row, int col, int length, Orientation dir) {
-    // Getting the count pointer for the length of the ship
+bool Board::placeShip(int row, int col, int length, Orientation dir) { 
+    //Check whether this ship length is valid
     int* remaining = remainingFor(length);
 
-    if (remaining == nullptr || *remaining == 0) return false;
-    if (!canPlace(row, col, length, dir)) return false;
+    if (remaining == nullptr || *remaining <= 0) {
+        return false;
+    }
 
+    //Check whether the ship fits and does not overlap
+    if (!canPlace(row, col, length, dir)) {
+        return false;
+    }
+
+    //Place the ship
     for (int i = 0; i < length; i++) {
-        int r = row + (dir == Orientation::Vertical ? i : 0);
-        int c = col + (dir == Orientation::Horizontal ? i : 0);
+        int r = row;
+        int c = col;
+
+        if (dir == Orientation::Horizontal) {
+            c += i;
+        } else {
+            r += i;
+        }
+
         grid[r][c] = CellType::Ship;
     }
 
+    //Update the number of ships remaining to place
     (*remaining)--;
 
     return true;
+}
+
+void Board::randomlyPlaceFleet() { //Randomly choosing ship place direction
+    int shipLengths[] = {5, 4, 3, 3, 2};
+
+    for (int i = 0; i < 5; i++) {
+        bool placed = false;
+
+        while (!placed) {
+            int row = rand() % SIZE;
+            int col = rand() % SIZE;
+
+            int direction = rand() % 2;
+
+            Orientation dir;
+
+            if (direction == 0) {
+                dir = Orientation::Horizontal;
+            } else {
+                dir = Orientation::Vertical;
+            }
+
+            placed = placeShip(row, col, shipLengths[i], dir);
+        }
+    }
 }
 
 // Returns true on a hit, false on a miss, repeat shot, or out-of-bounds shot
