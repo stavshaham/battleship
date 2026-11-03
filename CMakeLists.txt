@@ -11,4 +11,6 @@ add_executable(battleship
         Board.h
         CellType.h
         Orientation.h
+        Player.cpp
+        Player.h
 )
