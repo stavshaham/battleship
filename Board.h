@@ -23,6 +23,7 @@ public:
     bool recordAttack(int row, int col);
     bool allShipsPlaced() const;
     bool allSunk() const;
+    void randomlyPlaceFleet();
     friend std::ostream& operator<<(std::ostream& os, const Board& board);
 };
 
