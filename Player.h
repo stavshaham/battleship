@@ -13,7 +13,7 @@ private:
 
 public:
     Player(string name);
-    virtual void makeMove() = 0;
+    virtual void makeMove(Board& opponentBoard) = 0;
     Board& getBoard();
 };
 

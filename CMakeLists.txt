@@ -13,4 +13,8 @@ add_executable(battleship
         Orientation.h
         Player.cpp
         Player.h
+        HumanPlayer.cpp
+        HumanPlayer.h
+        AIPlayer.cpp
+        AIPlayer.h
 )

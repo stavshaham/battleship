@@ -24,6 +24,7 @@ public:
     bool allShipsPlaced() const;
     bool allSunk() const;
     void randomlyPlaceFleet();
+    bool validAttack(int row, int col) const;
     friend std::ostream& operator<<(std::ostream& os, const Board& board);
 };
 

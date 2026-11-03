@@ -177,3 +177,12 @@ ostream& operator<<(ostream& os, const Board& board) {
     printBorder(os);
     return os;
 }
+
+bool Board::validAttack(int row, int col) const {
+    if (!inBounds(row, col)) {
+        return false;
+    }
+
+    return grid[row][col] == CellType::Water ||
+           grid[row][col] == CellType::Ship;
+}
