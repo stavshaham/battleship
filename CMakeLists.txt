@@ -17,4 +17,6 @@ add_executable(battleship
         HumanPlayer.h
         AIPlayer.cpp
         AIPlayer.h
+        Statistics.cpp
+        Statistics.h
 )

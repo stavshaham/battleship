@@ -16,6 +16,7 @@ private:
     bool inBounds(int row, int col) const;
     bool canPlace(int row, int col, int length, Orientation dir) const;
     int* remainingFor(int length);
+    void printBoard(std::ostream& output, bool showShips) const;
 
 public:
     Board();
@@ -26,6 +27,7 @@ public:
     void randomlyPlaceFleet();
     bool validAttack(int row, int col) const;
     friend std::ostream& operator<<(std::ostream& os, const Board& board);
+    void printHidden(std::ostream& output) const;
 };
 
 #endif //BATTLESHIP_BOARD_H

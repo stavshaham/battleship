@@ -1,6 +1,8 @@
 #include "Board.h"
 #include <iostream>
 #include <cstdlib>
+#include <string>
+
 
 using namespace std;
 
@@ -140,44 +142,6 @@ void printBorder(ostream& os) {
     os << "+\n";
 }
 
-ostream& operator<<(ostream& os, const Board& board) {
-    // Column numbers
-    os << "    ";
-    for (int c = 0; c < SIZE; c++) {
-        os << c << ' ';
-    }
-    os << '\n';
-
-    printBorder(os);
-
-    for (int r = 0; r < SIZE; r++) {
-        char letter = 'A' + r;
-        os << letter << " | ";
-        for (int c = 0; c < SIZE; c++) {
-            switch (board.grid[r][c]) {
-                case CellType::Water:
-                    os << BLUE   << '~';
-                    break;
-                case CellType::Ship:
-                    os << GREEN  << 'S';
-                    break;
-                case CellType::Hit:
-                    os << RED    << 'X';
-                    break;
-                case CellType::Miss:
-                    os << YELLOW << 'O';
-                    break;
-            }
-
-            os << RESET << ' ';
-        }
-        os << "|\n";
-    }
-
-    printBorder(os);
-    return os;
-}
-
 bool Board::validAttack(int row, int col) const {
     if (!inBounds(row, col)) {
         return false;
@@ -185,4 +149,61 @@ bool Board::validAttack(int row, int col) const {
 
     return grid[row][col] == CellType::Water ||
            grid[row][col] == CellType::Ship;
+}
+
+void Board::printBoard(ostream& output, bool showShips) const {
+    output << "    ";
+
+    for (int col = 0; col < SIZE; col++) {
+        output << col << ' ';
+    }
+
+    output << '\n';
+
+    printBorder(output);
+
+    for (int row = 0; row < SIZE; row++) {
+        char rowLetter = 'A' + row;
+
+        output << rowLetter << " | ";
+
+        for (int col = 0; col < SIZE; col++) {
+            switch (grid[row][col]) {
+                case CellType::Water:
+                    output << BLUE << '~';
+                    break;
+
+                case CellType::Ship:
+                    if (showShips) {
+                        output << GREEN << 'S';
+                    } else {
+                        output << BLUE << '~';
+                    }
+                    break;
+
+                case CellType::Hit:
+                    output << RED << 'X';
+                    break;
+
+                case CellType::Miss:
+                    output << YELLOW << 'O';
+                    break;
+            }
+
+            output << RESET << ' ';
+        }
+
+        output << "|\n";
+    }
+
+    printBorder(output);
+}
+
+void Board::printHidden(ostream& output) const {
+    printBoard(output, false);
+}
+
+ostream& operator<<(ostream& output, const Board& board) {
+    board.printBoard(output, true);
+    return output;
 }

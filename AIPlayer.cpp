@@ -2,6 +2,10 @@
 #include "Board.h"
 #include "AIPlayer.h"
 
+using namespace std;
+
+AIPlayer::AIPlayer(string name) : Player(name) {}
+
 void AIPlayer::makeMove(Board& opponentBoard) {
     bool moveCompleted = false;
 
@@ -13,9 +17,9 @@ void AIPlayer::makeMove(Board& opponentBoard) {
             bool hit = opponentBoard.recordAttack(row, col);
 
             if (hit) {
-                std::cout << "AI hit your ship!\n";
+                cout << "AI hit your ship!\n";
             } else {
-                std::cout << "AI missed.\n";
+                cout << "AI missed.\n";
             }
 
             moveCompleted = true;

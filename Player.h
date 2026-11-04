@@ -15,6 +15,7 @@ public:
     Player(string name);
     virtual void makeMove(Board& opponentBoard) = 0;
     Board& getBoard();
+    virtual ~Player();
 };
 
 #endif //BATTLESHIP_PLAYER_H

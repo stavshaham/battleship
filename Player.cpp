@@ -1,7 +1,3 @@
-//
-// Created by Stav Shaham on 11/2/26.
-//
-
 #include "Player.h"
 
 Player::Player(string name) {
@@ -11,4 +7,8 @@ Player::Player(string name) {
 
 Board &Player::getBoard() {
     return *this->board;
+}
+
+Player::~Player() {
+    delete this->board;
 }
