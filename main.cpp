@@ -2,6 +2,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <climits>
+#include <sstream>
+#include <iomanip>
+#include <vector>
+#include <string>
+#include <algorithm>
 #include "Board.h"
 #include "Statistics.h"
 #include "HumanPlayer.h"
@@ -9,8 +14,14 @@
 
 using namespace std;
 
+const std::string RESET = "\033[0m";
+const std::string BLUE = "\033[34m";
+const std::string PINK ="\033[95m";
+const string BROWN = "\033[38;5;130m";
+const string WHITE = "\033[37m";
+
 void displayTitle() {
-    cout<<"__        __   _                            _ "<<endl;
+    cout<< PINK <<"__        __   _                            _ "<<endl;
     cout<<"\\ \\      / /__| | ___ ___  _ __ ___   ___  | |_ ___ "<<endl;
     cout<<" \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\ | __/ _ \\ "<<endl;
     cout<<"  \\ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) |"<<endl;
@@ -20,19 +31,21 @@ void displayTitle() {
     cout<<"| |_) | (_| | |_| |_| |  __/\\__ \\ | | | | |_) |"<<endl;
     cout<<"|____/ \\__,_|\\__|\\__|_|\\___||___/_| |_|_| .__/"<<endl;
     cout<<"                                        |_| "<<endl;
+    cout << RESET << ' ';
 
-    cout << "                 |    |    |                         \n";
-    cout << "                )_)  )_)  )_)                        \n";
+    cout <<BROWN << "                 |    |    |                         \n";
+    cout <<WHITE<< "                )_)  )_)  )_)                        \n";
     cout << "               )___))___))___)                       \n";
-    cout << "              )____)____)_____)\\                    \n";
+    cout <<WHITE<< "              )____)____)_____)"<<BROWN<<"\\                    \n";
     cout << "            _____|____|____|____\\\\__                \n";
-    cout << "   ---------\\                   /---------           \n";
-    cout << "     ^^^^^ ^^^^^^^^^^^^^^^^^^^^^                     \n";
+    cout <<BLUE<< "   ---------"<<BROWN<<"\\                   /"<<BLUE<<"---------           \n";
+    cout <<BLUE << "     ^^^^^ ^^^^^^^^^^^^^^^^^^^^^                     \n";
     cout << "       ^^^^      ^^^^     ^^^^^^                     \n\n";
+    cout << RESET << ' ';
 }
 
 void displayMenu() {
-    cout << "==== Main Menu ==== " << endl;
+    cout << "\n==== Main Menu ==== " << endl;
     cout << "1. Player Against AI" << endl;
     cout << "2. Player Against Another Player" << endl;
     cout << "3. View Statistics" << endl;
@@ -40,6 +53,53 @@ void displayMenu() {
     cout << "Choose an option: " << endl;
 }
 
+
+void displayBoardsSideBySide(Board& boardOne, bool hiddenOne,
+                             string titleOne,
+                             Board& boardTwo, bool hiddenTwo,
+                             string titleTwo) {
+
+    // Capture the first board
+    ostringstream outputOne;
+
+    if (hiddenOne) {
+        boardOne.printHidden(outputOne);
+    } else {
+        outputOne << boardOne;
+    }
+
+    // Capture the second board
+    ostringstream outputTwo;
+
+    if (hiddenTwo) {
+        boardTwo.printHidden(outputTwo);
+    } else {
+        outputTwo << boardTwo;
+    }
+
+    // Convert captured output into input streams
+    istringstream inputOne(outputOne.str());
+    istringstream inputTwo(outputTwo.str());
+
+    string lineOne;
+    string lineTwo;
+
+    // Print titles
+    cout << "\n" << titleOne << "                 " << titleTwo << endl;
+
+    // Print both boards side by side
+    while (true) {
+
+        bool hasFirst = static_cast<bool>(getline(inputOne, lineOne));
+        bool hasSecond = static_cast<bool>(getline(inputTwo, lineTwo));
+
+        if (!hasFirst && !hasSecond) {
+            break;
+        }
+
+        cout << left << lineOne << "          " << lineTwo << endl;
+    }
+}
 int playGame(Player& playerOne, Player& playerTwo, bool showPlayerTwoBoard) {
     playerOne.getBoard().randomlyPlaceFleet();
     playerTwo.getBoard().randomlyPlaceFleet();
@@ -47,32 +107,38 @@ int playGame(Player& playerOne, Player& playerTwo, bool showPlayerTwoBoard) {
     int winner = 0;
 
     while (winner == 0) {
-        // Show Player 1's own board
-        cout << "\n=== Player 1's Board ===\n";
-        cout << playerOne.getBoard();
 
-        // Show Player 1's attacks on Player 2's board
-        cout << "\n=== Player 1's Attack Board ===\n";
-        playerTwo.getBoard().printHidden(cout);
+        // Display Player 1's boards side by side
+        displayBoardsSideBySide(
+            playerOne.getBoard(), false, "Player 1's Board",
+            playerTwo.getBoard(), true, "Player 1's Attack Board"
+        );
 
         cout << "\nPlayer 1's turn.\n";
         playerOne.makeMove(playerTwo.getBoard());
 
         if (playerTwo.getBoard().allSunk()) {
             winner = 1;
-        } else {
-            // Show Player 2's own board only in human-versus-human mode
+        } 
+        else {
+
+            // Display Player 2's boards side by side
             if (showPlayerTwoBoard) {
-                cout << "\n=== Player 2's Board ===\n";
-                cout << playerTwo.getBoard();
+
+                displayBoardsSideBySide(
+                    playerTwo.getBoard(), false, "Player 2's Board",
+                    playerOne.getBoard(), true, "Player 2's Attack Board"
+                );
             }
 
             cout << "\nPlayer 2's turn.\n";
             playerTwo.makeMove(playerOne.getBoard());
 
-            // Show Player 2's attacks on Player 1's board
-            cout << "\n=== Player 2's Attack Board ===\n";
-            playerOne.getBoard().printHidden(cout);
+            // Show Player 2's attacks against Player 1
+            if (!showPlayerTwoBoard) {
+                cout << "\nPlayer 2's Attack Board\n";
+                playerOne.getBoard().printHidden(cout);
+            }
 
             if (playerOne.getBoard().allSunk()) {
                 winner = 2;
@@ -122,7 +188,7 @@ int main() {
         cin >> choice;
     }
 
-    while (choice != 4) {
+    while (choice) {
         int winner = 0;
         switch (choice) {
             // Adding a scope to avoid variables jumping from case to case
@@ -150,7 +216,8 @@ int main() {
             }
 
             case 4:
-                cout << "Exiting the game." << endl;
+                cout << "\nExiting the game." << endl;
+                return 0;
                 break;
 
             default:
