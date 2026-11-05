@@ -5,6 +5,11 @@
 
 using namespace std;
 
+const std::string RESET = "\033[0m";
+const std::string RED = "\033[31m"; // For hits (X)
+const std::string YELLOW = "\033[33m"; // For misses (O)
+
+
 HumanPlayer::HumanPlayer(string name) : Player(name) {}
 
 void HumanPlayer::makeMove(Board& opponentBoard) {
@@ -38,9 +43,11 @@ void HumanPlayer::makeMove(Board& opponentBoard) {
             bool hit = opponentBoard.recordAttack(row, col);
 
             if (hit) {
-                cout << "Hit!\n";
+                cout << RED<<"Hit!\n";
+                cout << RESET << ' ';
             } else {
-                cout << "Miss!\n";
+                cout << YELLOW<<"Miss!\n";
+                cout << RESET << ' ';
             }
 
             moveCompleted = true;
