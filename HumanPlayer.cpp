@@ -1,17 +1,17 @@
 #include "HumanPlayer.h"
 #include <iostream>
-#include <cctype>
 #include <climits>
 
 using namespace std;
 
-const std::string RESET = "\033[0m";
-const std::string RED = "\033[31m"; // For hits (X)
-const std::string YELLOW = "\033[33m"; // For misses (O)
+const string RESET = "\033[0m";
+const string RED = "\033[31m"; // For hits (X)
+const string YELLOW = "\033[33m"; // For misses (O)
 
-
+// Creates a human player and initializes the inherited Player portion.
 HumanPlayer::HumanPlayer(string name) : Player(name) {}
 
+// Reads an attack coordinate, validates it, and records the attack.
 void HumanPlayer::makeMove(Board& opponentBoard) {
     bool moveCompleted = false;
 
@@ -23,14 +23,14 @@ void HumanPlayer::makeMove(Board& opponentBoard) {
 
         if (!(cin >> rowLetter >> col)) {
             if (cin.eof()) {
-                cout << "\nInput stream closed. Exiting game.\n";
+                cout << endl << "Input stream closed. Exiting game." << endl;
                 return;
             }
 
             cin.clear();
             cin.ignore(INT_MAX, '\n');
 
-            cout << "Invalid input. Enter a letter and a number.\n";
+            cout << "Invalid input. Enter a letter and a number." << endl;
             continue; // Goes back to the beginning of the loop
         }
 
@@ -38,15 +38,15 @@ void HumanPlayer::makeMove(Board& opponentBoard) {
         int row = rowLetter - 'A';
 
         if (!opponentBoard.validAttack(row, col)) {
-            cout << "Invalid move. Try again.\n";
+            cout << "Invalid move. Try again." << endl;
         } else {
             bool hit = opponentBoard.recordAttack(row, col);
 
             if (hit) {
-                cout << RED<<"Hit!\n";
+                cout << RED<<"Hit!" << endl;
                 cout << RESET << ' ';
             } else {
-                cout << YELLOW<<"Miss!\n";
+                cout << YELLOW<<"Miss!" << endl;
                 cout << RESET << ' ';
             }
 

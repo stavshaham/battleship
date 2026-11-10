@@ -1,17 +1,17 @@
+// Prints the board while hiding unhit ships.
 #include "Board.h"
 #include <iostream>
-#include <cstdlib>
 #include <string>
-
 
 using namespace std;
 
-const std::string RESET = "\033[0m";
-const std::string BLUE = "\033[34m"; // For ocean water (~)
-const std::string RED = "\033[31m"; // For hits (X)
-const std::string GREEN = "\033[32m"; // For your own healthy ships
-const std::string YELLOW = "\033[33m"; // For misses (O)
+const string RESET = "\033[0m";
+const string BLUE = "\033[34m"; // For ocean water (~)
+const string RED = "\033[31m"; // For hits (X)
+const string GREEN = "\033[32m"; // For your own healthy ships
+const string YELLOW = "\033[33m"; // For misses (O)
 
+// Creates a board whose cells all initially contain water.
 Board::Board() {
     for (int r = 0; r < SIZE; r++) {
         for (int c = 0; c < SIZE; c++) {
@@ -20,10 +20,12 @@ Board::Board() {
     }
 }
 
+// Checks whether the specified row and column are within the board.
 bool Board::inBounds(int row, int col) const {
     return row >= 0 && row < SIZE && col >= 0 && col < SIZE;
 }
 
+// Returns the remaining-ship counter associated with a ship length.
 // Returns a pointer to the counter for ships of this length, or nullptr if invalid
 int* Board::remainingFor(int length) {
     switch (length) {
@@ -35,6 +37,7 @@ int* Board::remainingFor(int length) {
     }
 }
 
+// Checks whether every cell required by a ship is available.
 bool Board::canPlace(int row, int col, int length, Orientation dir) const {
     for (int i = 0; i < length; i++) {
         int r = row + (dir == Orientation::Vertical ? i : 0);
@@ -46,6 +49,7 @@ bool Board::canPlace(int row, int col, int length, Orientation dir) const {
     return true;
 }
 
+// Places a ship and decreases the remaining count for its length.
 bool Board::placeShip(int row, int col, int length, Orientation dir) { 
     //Check whether this ship length is valid
     int* remaining = remainingFor(length);
@@ -79,7 +83,9 @@ bool Board::placeShip(int row, int col, int length, Orientation dir) {
     return true;
 }
 
-void Board::randomlyPlaceFleet() { //Randomly choosing ship place direction
+// Randomly places the five ships in the standard fleet.
+// Randomly choosing ship place direction
+void Board::randomlyPlaceFleet() {
     int shipLengths[] = {5, 4, 3, 3, 2};
 
     for (int i = 0; i < 5; i++) {
@@ -104,6 +110,7 @@ void Board::randomlyPlaceFleet() { //Randomly choosing ship place direction
     }
 }
 
+// Records a hit or miss at the requested coordinate.
 // Returns true on a hit, false on a miss, repeat shot, or out-of-bounds shot
 bool Board::recordAttack(int row, int col) {
     if (!inBounds(row, col)) return false;
@@ -119,10 +126,12 @@ bool Board::recordAttack(int row, int col) {
     return false;
 }
 
+// Reports whether all required ships have been placed.
 bool Board::allShipsPlaced() const {
     return shipsOfFive + shipsOfFour + shipsOfThree + shipsOfTwo == 0;
 }
 
+// Reports whether every ship cell has been hit.
 bool Board::allSunk() const {
     for (int r = 0; r < SIZE; r++) {
         for (int c = 0; c < SIZE; c++) {
@@ -132,6 +141,7 @@ bool Board::allSunk() const {
     return true;
 }
 
+// Prints the border used around a board display.
 void printBorder(ostream& os) {
     os << "  +";
 
@@ -139,9 +149,10 @@ void printBorder(ostream& os) {
         os << '-';
     }
 
-    os << "+\n";
+    os << "+" << endl;
 }
 
+// Checks whether a coordinate contains an un attacked water or ship cell.
 bool Board::validAttack(int row, int col) const {
     if (!inBounds(row, col)) {
         return false;
@@ -151,6 +162,7 @@ bool Board::validAttack(int row, int col) const {
            grid[row][col] == CellType::Ship;
 }
 
+// Prints the board with the option to reveal or hide ships.
 void Board::printBoard(ostream& output, bool showShips) const {
     output << "    ";
 
@@ -158,7 +170,7 @@ void Board::printBoard(ostream& output, bool showShips) const {
         output << col << ' ';
     }
 
-    output << '\n';
+    output << endl;
 
     printBorder(output);
 
@@ -193,16 +205,18 @@ void Board::printBoard(ostream& output, bool showShips) const {
             output << RESET << ' ';
         }
 
-        output << "|\n";
+        output << "|" << endl;
     }
 
     printBorder(output);
 }
 
+// Prints a version of the board that hides unhit ships.
 void Board::printHidden(ostream& output) const {
     printBoard(output, false);
 }
 
+// Prints the complete board through the stream insertion operator.
 ostream& operator<<(ostream& output, const Board& board) {
     board.printBoard(output, true);
     return output;
